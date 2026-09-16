@@ -1,0 +1,621 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smart Recipe & Grocery Generator</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f5f7fb;
+    color: #1f2937;
+}
+
+header {
+    background: linear-gradient(135deg, #16a34a, #15803d);
+    color: white;
+    padding: 28px 8%;
+    text-align: center;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 32px;
+}
+
+header p {
+    margin: 10px 0 0;
+    font-size: 16px;
+}
+
+.container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 25px auto;
+}
+
+.search-box {
+    background: white;
+    padding: 22px;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+    margin-bottom: 25px;
+}
+
+.search-box h2 {
+    margin-top: 0;
+}
+
+.input-row {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+input, select {
+    padding: 13px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 15px;
+}
+
+input {
+    flex: 1;
+    min-width: 220px;
+}
+
+button {
+    border: none;
+    padding: 13px 18px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.search-btn {
+    background: #16a34a;
+    color: white;
+}
+
+.clear-btn {
+    background: #e5e7eb;
+    color: #374151;
+}
+
+.recipe-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+}
+
+.recipe-card {
+    background: white;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+    transition: 0.3s;
+}
+
+.recipe-card:hover {
+    transform: translateY(-5px);
+}
+
+.recipe-image {
+    height: 150px;
+    background: linear-gradient(135deg, #dcfce7, #bbf7d0);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 65px;
+}
+
+.recipe-content {
+    padding: 18px;
+}
+
+.recipe-content h3 {
+    margin: 0 0 8px;
+}
+
+.recipe-content p {
+    color: #6b7280;
+    font-size: 14px;
+}
+
+.tags {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin: 12px 0;
+}
+
+.tag {
+    background: #dcfce7;
+    color: #166534;
+    padding: 5px 9px;
+    border-radius: 20px;
+    font-size: 12px;
+}
+
+.view-btn {
+    background: #2563eb;
+    color: white;
+    width: 100%;
+}
+
+.section-title {
+    margin: 30px 0 15px;
+}
+
+.grocery-section {
+    background: white;
+    padding: 22px;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+    margin-top: 25px;
+}
+
+.grocery-input {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 18px;
+}
+
+.grocery-input input {
+    flex: 1;
+}
+
+.add-btn {
+    background: #f59e0b;
+    color: white;
+}
+
+#groceryList {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+#groceryList li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    border-bottom: 1px solid #e5e7eb;
+    gap: 10px;
+}
+
+.item-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.purchased {
+    text-decoration: line-through;
+    color: #9ca3af;
+}
+
+.delete-btn {
+    background: #fee2e2;
+    color: #dc2626;
+    padding: 8px 12px;
+}
+
+.empty {
+    color: #6b7280;
+    text-align: center;
+    padding: 15px;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.modal-content {
+    background: white;
+    width: 100%;
+    max-width: 550px;
+    max-height: 90vh;
+    overflow-y: auto;
+    border-radius: 15px;
+    padding: 25px;
+    position: relative;
+}
+
+.close-btn {
+    position: absolute;
+    right: 18px;
+    top: 15px;
+    background: #fee2e2;
+    color: #dc2626;
+    padding: 8px 12px;
+}
+
+.modal-content h2 {
+    color: #15803d;
+}
+
+.modal-content li {
+    margin: 10px 0;
+}
+
+footer {
+    text-align: center;
+    padding: 25px;
+    color: #6b7280;
+    font-size: 14px;
+}
+
+@media (max-width: 600px) {
+    header h1 {
+        font-size: 24px;
+    }
+
+    .input-row, .grocery-input {
+        flex-direction: column;
+    }
+
+    input, button {
+        width: 100%;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>🍳 Smart Recipe & Grocery Generator</h1>
+    <p>Find recipes using your ingredients and generate your grocery list</p>
+</header>
+
+<div class="container">
+
+    <div class="search-box">
+        <h2>🔍 Find Your Recipe</h2>
+        <p>Enter the ingredients you have at home.</p>
+
+        <div class="input-row">
+            <input type="text" id="ingredientInput"
+                   placeholder="Example: rice, tomato, onion">
+
+            <button class="search-btn" onclick="findRecipes()">
+                Find Recipes
+            </button>
+
+            <button class="clear-btn" onclick="clearSearch()">
+                Clear
+            </button>
+        </div>
+    </div>
+
+    <h2 class="section-title">🍽️ Recipe Suggestions</h2>
+
+    <div class="recipe-grid" id="recipeGrid"></div>
+
+    <div class="grocery-section">
+        <h2>🛒 My Grocery List</h2>
+        <p>Add missing ingredients or items you want to buy.</p>
+
+        <div class="grocery-input">
+            <input type="text" id="groceryInput"
+                   placeholder="Enter grocery item">
+
+            <button class="add-btn" onclick="addGrocery()">
+                Add Item
+            </button>
+        </div>
+
+        <ul id="groceryList"></ul>
+    </div>
+
+</div>
+
+<div class="modal" id="recipeModal">
+    <div class="modal-content">
+        <button class="close-btn" onclick="closeModal()">✕</button>
+        <div id="modalBody"></div>
+    </div>
+</div>
+
+<footer>
+    Smart Recipe & Grocery Generator | Web Application Mini Project
+</footer>
+
+<script>
+const recipes = [
+    {
+        name: "Tomato Rice",
+        emoji: "🍅",
+        description: "A simple and delicious rice dish prepared with tomato and spices.",
+        ingredients: ["rice", "tomato", "onion", "oil", "salt", "spices"],
+        time: "30 mins",
+        difficulty: "Easy",
+        steps: [
+            "Wash and cook the rice.",
+            "Heat oil in a pan and saute onion.",
+            "Add chopped tomato and spices.",
+            "Mix the cooked rice with the tomato mixture.",
+            "Serve hot."
+        ]
+    },
+    {
+        name: "Vegetable Fried Rice",
+        emoji: "🍚",
+        description: "A quick fried rice made with vegetables and cooked rice.",
+        ingredients: ["rice", "carrot", "beans", "onion", "oil", "salt"],
+        time: "25 mins",
+        difficulty: "Easy",
+        steps: [
+            "Cook the rice and keep it aside.",
+            "Heat oil in a pan.",
+            "Add onion, carrot and beans.",
+            "Add cooked rice and salt.",
+            "Mix well and serve."
+        ]
+    },
+    {
+        name: "Masala Omelette",
+        emoji: "🍳",
+        description: "A protein-rich omelette prepared with eggs and vegetables.",
+        ingredients: ["egg", "onion", "tomato", "salt", "oil"],
+        time: "15 mins",
+        difficulty: "Easy",
+        steps: [
+            "Break the eggs into a bowl.",
+            "Add chopped onion, tomato and salt.",
+            "Beat the mixture well.",
+            "Heat oil in a pan and pour the mixture.",
+            "Cook both sides and serve."
+        ]
+    },
+    {
+        name: "Paneer Curry",
+        emoji: "🥘",
+        description: "A tasty curry made with paneer, tomato and Indian spices.",
+        ingredients: ["paneer", "tomato", "onion", "oil", "salt", "spices"],
+        time: "35 mins",
+        difficulty: "Medium",
+        steps: [
+            "Cut paneer into small cubes.",
+            "Saute onion in oil.",
+            "Add tomato and spices.",
+            "Add paneer and cook for 10 minutes.",
+            "Serve with rice or chapati."
+        ]
+    },
+    {
+        name: "Bread Sandwich",
+        emoji: "🥪",
+        description: "A quick snack made with bread and fresh vegetables.",
+        ingredients: ["bread", "tomato", "onion", "cheese", "salt"],
+        time: "10 mins",
+        difficulty: "Easy",
+        steps: [
+            "Take two slices of bread.",
+            "Add tomato, onion and cheese.",
+            "Sprinkle salt and spices.",
+            "Toast the sandwich.",
+            "Serve immediately."
+        ]
+    },
+    {
+        name: "Vegetable Soup",
+        emoji: "🍲",
+        description: "A healthy soup prepared with fresh vegetables.",
+        ingredients: ["carrot", "beans", "onion", "salt", "water"],
+        time: "25 mins",
+        difficulty: "Easy",
+        steps: [
+            "Wash and chop the vegetables.",
+            "Boil water in a pan.",
+            "Add all vegetables and salt.",
+            "Cook until the vegetables become soft.",
+            "Serve hot."
+        ]
+    }
+];
+
+let groceryList = [];
+
+function displayRecipes(list = recipes) {
+    const grid = document.getElementById("recipeGrid");
+
+    if (list.length === 0) {
+        grid.innerHTML = `
+            <p class="empty">
+                No matching recipes found. Try different ingredients.
+            </p>
+        `;
+        return;
+    }
+
+    grid.innerHTML = list.map((recipe, index) => `
+        <div class="recipe-card">
+            <div class="recipe-image">${recipe.emoji}</div>
+
+            <div class="recipe-content">
+                <h3>${recipe.name}</h3>
+                <p>${recipe.description}</p>
+
+                <div class="tags">
+                    <span class="tag">⏱ ${recipe.time}</span>
+                    <span class="tag">⭐ ${recipe.difficulty}</span>
+                </div>
+
+                <button class="view-btn"
+                        onclick="viewRecipe(${recipes.indexOf(recipe)})">
+                    View Recipe
+                </button>
+            </div>
+        </div>
+    `).join("");
+}
+
+function findRecipes() {
+    const input = document.getElementById("ingredientInput")
+        .value.toLowerCase()
+        .split(",")
+        .map(item => item.trim())
+        .filter(item => item !== "");
+
+    if (input.length === 0) {
+        displayRecipes();
+        return;
+    }
+
+    const filtered = recipes.filter(recipe =>
+        input.some(item =>
+            recipe.ingredients.some(ingredient =>
+                ingredient.includes(item) || item.includes(ingredient)
+            )
+        )
+    );
+
+    displayRecipes(filtered);
+}
+
+function clearSearch() {
+    document.getElementById("ingredientInput").value = "";
+    displayRecipes();
+}
+
+function viewRecipe(index) {
+    const recipe = recipes[index];
+
+    const available = document.getElementById("ingredientInput")
+        .value.toLowerCase()
+        .split(",")
+        .map(item => item.trim());
+
+    const missing = recipe.ingredients.filter(
+        item => !available.includes(item)
+    );
+
+    document.getElementById("modalBody").innerHTML = `
+        <h2>${recipe.emoji} ${recipe.name}</h2>
+        <p>${recipe.description}</p>
+
+        <h3>Ingredients</h3>
+        <ul>
+            ${recipe.ingredients.map(item => `<li>${item}</li>`).join("")}
+        </ul>
+
+        <h3>Cooking Steps</h3>
+        <ol>
+            ${recipe.steps.map(step => `<li>${step}</li>`).join("")}
+        </ol>
+
+        <h3>🛒 Missing Ingredients</h3>
+        ${
+            missing.length > 0
+            ? `
+                <ul>
+                    ${missing.map(item => `<li>${item}</li>`).join("")}
+                </ul>
+                <button class="add-btn" onclick='addMissing(${JSON.stringify(missing)})'>
+                    Add Missing Ingredients
+                </button>
+              `
+            : "<p>✅ You have all the ingredients for this recipe!</p>"
+        }
+    `;
+
+    document.getElementById("recipeModal").style.display = "flex";
+}
+
+function closeModal() {
+    document.getElementById("recipeModal").style.display = "none";
+}
+
+function addMissing(items) {
+    items.forEach(item => {
+        if (!groceryList.includes(item)) {
+            groceryList.push(item);
+        }
+    });
+
+    displayGrocery();
+    closeModal();
+}
+
+function addGrocery() {
+    const input = document.getElementById("groceryInput");
+    const item = input.value.trim();
+
+    if (item === "") {
+        alert("Please enter a grocery item.");
+        return;
+    }
+
+    if (!groceryList.includes(item)) {
+        groceryList.push(item);
+    }
+
+    input.value = "";
+    displayGrocery();
+}
+
+function deleteGrocery(index) {
+    groceryList.splice(index, 1);
+    displayGrocery();
+}
+
+function displayGrocery() {
+    const list = document.getElementById("groceryList");
+
+    if (groceryList.length === 0) {
+        list.innerHTML = `
+            <li class="empty">Your grocery list is empty.</li>
+        `;
+        return;
+    }
+
+    list.innerHTML = groceryList.map((item, index) => `
+        <li>
+            <div class="item-left">
+                <input type="checkbox"
+                       onchange="togglePurchased(this, ${index})">
+                <span>${item}</span>
+            </div>
+
+            <button class="delete-btn"
+                    onclick="deleteGrocery(${index})">
+                Delete
+            </button>
+        </li>
+    `).join("");
+}
+
+function togglePurchased(checkbox, index) {
+    const span = checkbox.parentElement.querySelector("span");
+
+    if (checkbox.checked) {
+        span.classList.add("purchased");
+    } else {
+        span.classList.remove("purchased");
+    }
+}
+
+displayRecipes();
+displayGrocery();
+</script>
+
+</body>
+</html>
+```
